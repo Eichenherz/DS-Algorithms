@@ -166,7 +166,8 @@ inline void Vector<T>::push_back( const T & obj )
 template<typename T>
 inline void Vector<T>::pop_back()
 {
-	--lenght;
+	if ( !empty() )
+		--lenght;
 }
 
 template<typename T>
@@ -178,7 +179,7 @@ inline T & Vector<T>::back()
 template<typename T>
 inline const T & Vector<T>::back() const
 {
-	return p_objects [lenght];
+	return p_objects [lenght - 1];
 }
 
 template<typename T>
@@ -214,11 +215,11 @@ inline typename Vector<T>::const_iterator Vector<T>::c_begin()
 template<typename T>
 inline typename Vector<T>::iterator Vector<T>::end()
 {
-	return &( p_objects [lenght + 1] );
+	return &( p_objects [lenght] );
 }
 
 template<typename T>
 inline typename Vector<T>::const_iterator Vector<T>::c_end()
 {
-	return &( p_objects [sze + 1] );
+	return &( p_objects [lenght] );
 }
