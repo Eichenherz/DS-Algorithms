@@ -12,10 +12,103 @@ template<typename T>
 class List
 {
 public:
+	class const_iterator
+	{
+	public:
+		const_iterator()
+			:
+			p_node{ nullptr }
+		{}
+
+		bool					operator==( const const_iterator& ref ) const
+		{
+			return ( p_node == ref.p_node );
+		}
+		bool					operator!=( const const_iterator& ref ) const
+		{
+			return !( *this == ref );
+		}
+		const const_iterator&	operator++()
+		{
+			this->p_node = p_node->next;
+			return *this;
+		}
+		const const_iterator&	operator++( int )
+		{
+			const const_iterator temp = *this;
+			++( *this );
+			return temp;
+		}
+		const const_iterator&	operator--()
+		{
+			this->p_node = p_node->prev;
+			return *this;
+		}
+		const const_iterator&	operator--( int )
+		{
+			const const_iterator temp = *this;
+			--( *this );
+			return temp;
+		}
+		const T&				operator*() const
+		{
+			return p_node->data;
+		}
+
+	protected:
+		class Node* p_node;
+		const_iterator( Node* p )
+			:
+			p_node(p)
+		{}
+		friend class List<T>;
+	};
+	class iterator : public const_iterator
+	{
+	public:
+		iterator()
+		{}
+		
+		iterator&	operator++()
+		{
+			this->p_node = p_node->next;
+			return *this;
+		}
+		iterator&	operator++( int )
+		{
+			iterator temp = *this;
+			++( *this );
+			return temp;
+		}
+		iterator&	operator--()
+		{
+			this->p_node = p_node->prev;
+			return *this;
+		}
+		iterator&	operator--( int )
+		{
+			iterator temp = *this;
+			--( *this );
+			return temp;
+		}
+		T&			operator*()
+		{
+			return p_node->data;
+		}
+		
+	protected:
+		iterator( Node* p )
+			:
+			const_iterator{ p }
+		{}
+		friend class List<T>;
+	};
+
+
 	 List();
 	 List( const List& other );
 	~List();
-	List& operator=( const List& other );
+	List<T>& operator=( const List& other );
 
 	T&		 back();
 	const T& back() const;
@@ -24,23 +117,21 @@ public:
 
 	void push_back( const T& elem );
 	void push_front( const T& elem );
-	void insert( const T& elem, const int pos );
 	void pop_back();
 	void pop_front();
-	void erase( const int pos );
 
-	void clear();
+	iterator insert( iterator pos, const T & elem );
+	iterator erase( iterator pos );
+	void	 clear();
 
 	int	 size() const;
 	bool empty() const;
 
-	bool operator==( const List& other ) const;
-	bool operator!=( const List& other ) const;
+	iterator		begin();
+	const_iterator	cbegin() const;
+	iterator		end();
+	const_iterator	cend() const;
 
-	class const_iterator
-	{};
-	class iterator : const_iterator
-	{};
 
 private:
 	struct	Node
@@ -66,8 +157,9 @@ private:
 template<typename T>
 inline List<T>::List()
 	:
-	head(new Node()),
-	tail(new Node())
+	head	( new Node() ),
+	tail	( new Node() ),
+	lenght	( 0 )
 {
 	head.next = tail;
 	tail.prev = head;
@@ -76,17 +168,33 @@ inline List<T>::List()
 template<typename T>
 inline List<T>::List( const List & other )
 {
+	*this = other;
 }
 
 template<typename T>
 inline List<T>::~List()
 {
+	clear();
+	delete head;
+	delete tail;
+	tail = head = nullptr;
 }
 
 template<typename T>
-inline List & List<T>::operator=( const List & other )
+inline List<T> & List<T>::operator=( const List & other )
 {
-	// TODO: insert return statement here
+	clear();
+
+	head = new Node();
+	tail = new Node();
+	lenght = 0;
+	head.next = tail;
+	tail.prev = head;
+
+	for ( auto& elem : rhs )
+		push_back( elem );
+
+	return *this;
 }
 
 template<typename T>
@@ -119,6 +227,7 @@ inline void List<T>::push_back( const T & elem )
 	auto temp = new Node( elem, tail->prev, tail );
 	tail->prev->next = temp;
 	tail->prev = temp;
+	++lenght;
 }
 
 template<typename T>
@@ -127,12 +236,7 @@ inline void List<T>::push_front( const T & elem )
 	auto temp = new Node( elem, head, head->next );
 	head->next->prev = temp;
 	head->next = temp;
-}
-
-template<typename T>
-inline void List<T>::insert( const T & elem, const int pos )
-{
-	//Iter
+	++lenght;
 }
 
 template<typename T>
@@ -143,6 +247,7 @@ inline void List<T>::pop_back()
 	temp->prev->next = tail;
 
 	delete temp;
+	--lenght;
 }
 
 template<typename T>
@@ -153,28 +258,72 @@ inline void List<T>::pop_front()
 	temp->next->prev = head;
 
 	delete temp;
+	--lenght;
 }
 
 template<typename T>
-inline void List<T>::erase( const int pos )
+inline typename List<T>::iterator List<T>::insert( typename List<T>::iterator pos, const T & elem )
 {
-	//Iter
+	auto temp = new Node( elem, pos.p_node->prev, pos.p_node );
+	pos.p_node->prev->next = temp;
+	pos.p_node->prev = temp;
+	++lenght;
+	return iterator { temp };
+}
+
+template<typename T>
+inline typename List<T>::iterator List<T>::erase( typename List<T>::iterator pos )
+{
+	auto temp = pos.p_node;
+	iterator iter { temp->next };
+
+	temp->prev->next = temp->next;
+	temp->next->prev = temp->prev;
+
+	delete temp;
+	return iter;
 }
 
 template<typename T>
 inline void List<T>::clear()
 {
+	while ( !empty() )
+		pop_back();
 }
 
 template<typename T>
 inline int List<T>::size() const
 {
-	return 0;
+	return lenght;
 }
 
 template<typename T>
 inline bool List<T>::empty() const
 {
 	return lenght == 0;
+}
+
+template<typename T>
+inline typename List<T>::iterator List<T>::begin()
+{
+	return iterator { head->next };
+}
+
+template<typename T>
+inline typename List<T>::const_iterator List<T>::cbegin() const
+{
+	return const_iterator { head->next };
+}
+
+template<typename T>
+inline typename List<T>::iterator List<T>::end()
+{
+	return iterator { tail };
+}
+
+template<typename T>
+inline typename List<T>::const_iterator List<T>::cend() const
+{
+	return const_iterator { tail };
 }
 
