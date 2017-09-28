@@ -7,6 +7,7 @@
 //////////////////////////////////////
 ////  TODO: add assertions & 
 ////                  extra polish
+////				& testing
 //////////////////////////////////////
 template<typename T>
 class List
@@ -161,8 +162,8 @@ inline List<T>::List()
 	tail	( new Node() ),
 	lenght	( 0 )
 {
-	head.next = tail;
-	tail.prev = head;
+	head->next = tail;
+	tail->prev = head;
 }
 
 template<typename T>
@@ -188,8 +189,9 @@ inline List<T> & List<T>::operator=( const List & other )
 	head = new Node();
 	tail = new Node();
 	lenght = 0;
-	head.next = tail;
-	tail.prev = head;
+
+	head->next = tail;
+	tail->prev = head;
 
 	for ( auto& elem : rhs )
 		push_back( elem );
@@ -265,9 +267,11 @@ template<typename T>
 inline typename List<T>::iterator List<T>::insert( typename List<T>::iterator pos, const T & elem )
 {
 	auto temp = new Node( elem, pos.p_node->prev, pos.p_node );
+
 	pos.p_node->prev->next = temp;
 	pos.p_node->prev = temp;
 	++lenght;
+
 	return iterator { temp };
 }
 
@@ -279,6 +283,7 @@ inline typename List<T>::iterator List<T>::erase( typename List<T>::iterator pos
 
 	temp->prev->next = temp->next;
 	temp->next->prev = temp->prev;
+	--lenght;
 
 	delete temp;
 	return iter;
