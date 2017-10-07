@@ -57,7 +57,7 @@ public:
 		}
 
 	protected:
-		class Node* p_node;
+		struct Node* p_node;
 		const_iterator( Node* p )
 			:
 			p_node(p)
@@ -193,8 +193,8 @@ inline List<T> & List<T>::operator=( const List & other )
 	head->next = tail;
 	tail->prev = head;
 
-	for ( auto& elem : rhs )
-		push_back( elem );
+	for ( auto iter = other.cbegin(); iter != other.cend(); ++iter )
+		this->push_back( *iter );
 
 	return *this;
 }
