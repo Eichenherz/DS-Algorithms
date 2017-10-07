@@ -1,8 +1,10 @@
 #pragma once
 
 #include "List.h"
+#include "Vector.h"
 #include <iostream>
 #include <random>
+#include <math.h>
 
 //To be made template
 void Print_Lots( const List<int>& l, const List<int>& p )
@@ -30,8 +32,7 @@ template<typename Iter, typename T>
 typename List<T>::iterator find( Iter begin, Iter end, const T& obj )
 {
 	for ( ; begin != end; ++begin )
-		if ( *begin == obj )
-			return begin;
+		if ( *begin == obj ) return begin;
 	return end;
 }
 
@@ -99,15 +100,47 @@ List<T> reunion( const List<T>& alpha, const List<T>& beta )
 
 }
 
-//Just for lists of ints
-void Generate_Rand_Uniform( List<int>& list, int n_obj )
+//Not tera efficient though
+int josephus( int N )
+{
+	Vector<int> bitset;
+	// bitset[0] shifted MSB to LSB
+	bitset.push_back( 1 );
+	for (; N != 1; N /= 2 )
+		bitset.push_back( N % 2 );
+
+	int result = 0;
+	for ( auto pos = bitset.size() - 1; pos != 0; --pos )
+		result += bitset [pos] * int(std::exp2( pos ));
+
+	return ++result;
+}
+
+//To be completed
+int josephus_M( int N, int M )
+{
+	if ( M == 0 ) return N;
+
+
+}
+
+//Just for Vectors of ints
+void Generate_Rand_Uniform( Vector<int>& list, int n_obj )
 {
 	std::mt19937 rng( std::random_device {}( ) );
 	std::uniform_int_distribution<int> dist;
-	if( n_obj % 2 == 0 )
-		std::uniform_int_distribution<int> dist( -n_obj/2, n_obj/2 );
-	else
-		std::uniform_int_distribution<int> dist( -(n_obj + 1) / 2, n_obj / 2 );
+	if ( n_obj % 2 == 0 )
+	{
+		std::uniform_int_distribution<int> dist( -n_obj / 2, n_obj / 2 );
+		for ( ; n_obj != 0; --n_obj )
+			list.push_back( dist( rng ) );
+	}
 
-	list.push_back( dist( rng ) );
+	else
+	{
+		std::uniform_int_distribution<int> dist( -( n_obj + 1 ) / 2, n_obj / 2 );
+		for ( ; n_obj != 0; --n_obj )
+			list.push_back( dist( rng ) );
+	}
+
 }

@@ -146,6 +146,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Binary.h" />
     <ClInclude Include="List.h" />
     <ClInclude Include="Algorithms.h" />
     <ClInclude Include="Queue.h" />

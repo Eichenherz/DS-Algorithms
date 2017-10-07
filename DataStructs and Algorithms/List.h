@@ -104,8 +104,9 @@ public:
 		{}
 		friend class List<T>;
 	};
-
-
+	/**
+	**
+	**/
 	 List();
 	 List( const List& other );
 	~List();

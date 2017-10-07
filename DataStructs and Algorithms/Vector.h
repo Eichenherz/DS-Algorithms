@@ -1,5 +1,7 @@
 #pragma once
 
+#include <assert.h>
+
 //////////////////////////////////////
 ////******************************////
 ////       Vector CONTAINER       ////
@@ -30,13 +32,16 @@ public:
 
 	void	 resize( int n_size );
 	void	 reserve( int n_cap );
+	bool	 empty() const;
+	int		 size() const;
+	int		 capacity() const;
+
 	void	 push_back( const T& obj );
 	void	 pop_back();
 	T&		 back();
 	const T& back() const;
-	bool	 empty() const;
-	int		 size() const;
-	int		 capacity() const;
+	iterator insert( iterator pos, const T& obj );
+	iterator erase( iterator pos );
 
 	iterator		begin();
 	const_iterator	c_begin();
@@ -54,7 +59,7 @@ private:
 /////////////////////////////////////////////////
 ////			IMPLEMENTATION
 template<typename T>
-inline Vector<T>::Vector( int size )
+Vector<T>::Vector( int size )
 	:
 	lenght { size },
 	cap	   { size + SPARE_CAP }
@@ -63,7 +68,7 @@ inline Vector<T>::Vector( int size )
 }
 
 template<typename T>
-inline Vector<T>::Vector( const Vector & src )
+Vector<T>::Vector( const Vector & src )
 	:
 	lenght { src.lenght },
 	cap	   { src.cap }
@@ -75,7 +80,7 @@ inline Vector<T>::Vector( const Vector & src )
 }
 
 template<typename T>
-inline Vector<T>::Vector( Vector && src )
+Vector<T>::Vector( Vector && src )
 	:
 	lenght	  { src.lenght },
 	cap		  { src.cap },
@@ -85,14 +90,14 @@ inline Vector<T>::Vector( Vector && src )
 }
 
 template<typename T>
-inline Vector<T>::~Vector()
+Vector<T>::~Vector()
 {
 	delete[] p_objects;
 	p_objects = nullptr;
 }
 
 template<typename T>
-inline Vector<T>& Vector<T>::operator=( const Vector & src )
+Vector<T>& Vector<T>::operator=( const Vector & src )
 {
 	this->lenght = src.lenght;
 	this->cap = src.cap;
@@ -107,7 +112,7 @@ inline Vector<T>& Vector<T>::operator=( const Vector & src )
 }
 
 template<typename T>
-inline Vector<T>& Vector<T>::operator=( Vector && src )
+Vector<T>& Vector<T>::operator=( Vector && src )
 {
 	this->lenght = src.lenght;
 	this->cap = src.cap;
@@ -120,19 +125,23 @@ inline Vector<T>& Vector<T>::operator=( Vector && src )
 }
 
 template<typename T>
-inline T & Vector<T>::operator[]( const int index )
+T& Vector<T>::operator[]( const int index )
 {
+	assert( index >= 0 && index <= lenght - 1 );
+
 	return p_objects [index];
 }
 
 template<typename T>
-inline const T & Vector<T>::operator[]( const int index ) const
+const T & Vector<T>::operator[]( const int index ) const
 {
+	assert( index >= 0 && index <= lenght - 1 );
+
 	return p_objects [index];
 }
 
 template<typename T>
-inline void Vector<T>::resize( int n_size )
+void Vector<T>::resize( int n_size )
 {
 	if ( n_size > cap )
 		reserve( 2 * n_size );
@@ -140,7 +149,7 @@ inline void Vector<T>::resize( int n_size )
 }
 
 template<typename T>
-inline void Vector<T>::reserve( int n_cap )
+void Vector<T>::reserve( int n_cap )
 {
 	if ( n_cap < lenght ) return;
 
@@ -156,100 +165,102 @@ inline void Vector<T>::reserve( int n_cap )
 }
 
 template<typename T>
-inline void Vector<T>::push_back( const T & obj )
+void Vector<T>::push_back( const T & obj )
 {
-	if ( lenght == cap )
-		reserve( 2 * cap + 1 );
+	if ( lenght == cap ) reserve( 2 * cap );
+
 	p_objects [lenght++] = obj;
 }
 
 template<typename T>
-inline void Vector<T>::pop_back()
+void Vector<T>::pop_back()
 {
 	if ( !empty() )
 		--lenght;
 }
 
 template<typename T>
-inline T & Vector<T>::back()
+T & Vector<T>::back()
 {
 	return p_objects [lenght - 1];
 }
 
 template<typename T>
-inline const T & Vector<T>::back() const
+const T & Vector<T>::back() const
 {
 	return p_objects [lenght - 1];
 }
 
 template<typename T>
-inline bool Vector<T>::empty() const
+typename Vector<T>::iterator Vector<T>::insert( iterator pos, const T & obj )
+{
+	assert( pos > this->begin() && pos <= this->end() );
+	
+	if ( size() + 1 >= cap ) this->reserve( 2 * cap );
+
+	this->push_back( *( end() - 1 ) );
+	for ( auto iter = this->end() - 1; iter != pos; --iter )
+		*iter = *( iter - 1 );
+
+	*pos = obj;
+
+	return pos;
+}
+
+template<typename T>
+typename Vector<T>::iterator Vector<T>::erase( iterator pos )
+{
+	assert( pos > this->begin() && pos <= this->end() );
+
+	if ( pos == this->end() - 1 ) this->pop_back();
+	else
+	{
+		for ( auto iter = pos; iter != this->end(); ++iter )
+			*iter = *( iter + 1 );
+		this->pop_back();
+	}
+
+	return pos;
+}
+
+template<typename T>
+bool Vector<T>::empty() const
 {
 	return ( lenght == 0);
 }
 
 template<typename T>
-inline int Vector<T>::size() const
+int Vector<T>::size() const
 {
 	return lenght;
 }
 
 template<typename T>
-inline int Vector<T>::capacity() const
+int Vector<T>::capacity() const
 {
 	return cap;
 }
 
 template<typename T>
-inline typename Vector<T>::iterator Vector<T>::begin()
+typename Vector<T>::iterator Vector<T>::begin()
 {
 	return &( p_objects [0] );
 }
 
 template<typename T>
-inline typename Vector<T>::const_iterator Vector<T>::c_begin()
+typename Vector<T>::const_iterator Vector<T>::c_begin()
 {
 	return &( p_objects [0] );
 }
 
 template<typename T>
-inline typename Vector<T>::iterator Vector<T>::end()
+typename Vector<T>::iterator Vector<T>::end()
 {
 	return &( p_objects [lenght] );
 }
 
 template<typename T>
-inline typename Vector<T>::const_iterator Vector<T>::c_end()
+typename Vector<T>::const_iterator Vector<T>::c_end()
 {
 	return &( p_objects [lenght] );
-}
-
-
-void test()
-{
-	Vector<int> v_test;
-	std::cout << v_test.capacity() << " " << v_test.size() << std::endl;
-	v_test.reserve( 100 );
-	std::cout << v_test.capacity() << " " << v_test.size() << std::endl;
-	for ( int i = 0; i < ( v_test.capacity() / 5 ); ++i )
-		v_test.push_back( i % 5 );
-	for ( int i = 0; i < v_test.size(); ++i )
-		std::cout << v_test [i] << " ";
-	std::cout << std::endl;
-	std::cout << v_test.back() << std::endl;
-	std::cout << v_test.capacity() << " " << v_test.size() << std::endl;
-	v_test.pop_back();
-	v_test.pop_back();
-	v_test.pop_back();
-	for ( int i = 0; i < v_test.size(); ++i )
-		std::cout << v_test [i] << " ";
-	std::cout << std::endl;
-	std::cout << v_test.back() << std::endl;
-	std::cout << v_test.capacity() << " " << v_test.size() << std::endl;
-	v_test.resize( 15 );
-	for ( int i = 0; i < v_test.size(); ++i )
-		std::cout << v_test [i] << " ";
-	std::cout << std::endl;
-	std::cout << v_test.back() << std::endl;
-	std::cout << v_test.capacity() << " " << v_test.size() << std::endl;
 }
