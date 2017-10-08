@@ -2,197 +2,130 @@
 
 #include <assert.h>
 
-//////////////////////////////////////
-////******************************////
-////       Vector CONTAINER       ////
-////******************************////
-//////////////////////////////////////
-////  TODO: add assertions & 
-////                  extra polish
-//////////////////////////////////////
+////////////////////////////////////////
+////								////
+////       Vector CONTAINER			////
+////								////
+////////////////////////////////////////
 template<typename T>
 class Vector
 {
 public:
-	class	const_iterator
+	template<class T>
+	class iterator_
 	{
 	public:
-		const_iterator()
-			:
-			element { nullptr }
-		{}
-
-		bool	operator==( const const_iterator& ref ) const
-		{
-			return this->element == ref.element;
-		}
-		bool	operator!=( const const_iterator& ref ) const
-		{
-			return !( *this == ref );
-		}
-		bool	operator<( const const_iterator& ref ) const
-		{
-			return  this->element < ref.element ;
-		}
-		bool	operator<=( const const_iterator& ref ) const
-		{
-			return  ( *this == ref ) || ( *this < ref );
-		}
-		bool	operator>( const const_iterator& ref ) const
-		{
-			return this->element > ref.element;
-		}
-		bool	operator>=( const const_iterator& ref ) const
-		{
-			return ( *this == ref ) || ( *this > ref );
-		}
-
-		const const_iterator&	operator++()
-		{
-			++element;
-			return *this;
-		}
-		const const_iterator&	operator++( int )
-		{
-			const const_iterator temp = *this;
-			++( *this );
-			return temp;
-		}
-		const const_iterator&	operator--()
-		{
-			--element;
-			return *this;
-		}
-		const const_iterator&	operator--( int )
-		{
-			const const_iterator temp = *this;
-			--( *this );
-			return temp;
-		}
-		const const_iterator	operator-( int n ) const
-		{
-			auto temp = *this;
-			temp.element -= n;
-			return temp;
-		}
-		const const_iterator	operator+( int n ) const
-		{
-			auto temp = *this;
-			temp.element += n;
-			return temp;
-		}
-		const const_iterator&	operator-=( int n )
-		{
-			return *this = *this - n ;
-		}
-		const const_iterator&	operator+=( int n )
-		{
-			return *this = *this + n;
-		}
-		const T&				operator*() const
-		{
-			return *element;
-		}
-
-	protected:
-		T* element;
-
-		const_iterator( T* elem )
+		iterator_( T* elem = nullptr )
 			:
 			element { elem }
 		{}
 
-		friend class Vector<T>;
-	};
-	class	iterator : public const_iterator
-	{
-	public:
-		iterator()
-			:
-			element { nullptr }
-		{}
+		bool	operator==( const iterator_& ref ) const
+		{
+			return this->element == ref.element;
+		}
+		bool	operator!=( const iterator_& ref ) const
+		{
+			return !( *this == ref );
+		}
+		bool	operator<( const  iterator_& ref ) const
+		{
+			return  this->element < ref.element ;
+		}
+		bool	operator<=( const iterator_& ref ) const
+		{
+			return  ( *this == ref ) || ( *this < ref );
+		}
+		bool	operator>( const  iterator_& ref ) const
+		{
+			return this->element > ref.element;
+		}
+		bool	operator>=( const iterator_& ref ) const
+		{
+			return ( *this == ref ) || ( *this > ref );
+		}
 
-		iterator&	operator++()
+		iterator_&	operator++()
 		{
 			++element;
 			return *this;
 		}
-		iterator&	operator++( int )
+		iterator_&	operator++( int )
 		{
-			iterator temp = *this;
+			iterator_ temp = *this;
 			++( *this );
 			return temp;
 		}
-		iterator&	operator--()
+		iterator_&	operator--()
 		{
 			--element;
 			return *this;
 		}
-		iterator&	operator--( int )
+		iterator_&	operator--( int )
 		{
-			iterator temp = *this;
+			iterator_ temp = *this;
 			--( *this );
 			return temp;
 		}
-		iterator	operator-( int n )
+		iterator_	operator-( int n ) const
 		{
 			auto temp = *this;
 			temp.element -= n;
 			return temp;
 		}
-		iterator	operator+( int n )
+		iterator_	operator+( int n ) const
 		{
 			auto temp = *this;
 			temp.element += n;
 			return temp;
 		}
-		iterator&	operator-=( int n )
+		iterator_&	operator-=( int n )
 		{
-			return *this = *this - n;
+			return *this = *this - n ;
 		}
-		iterator&	operator+=( int n )
+		iterator_&	operator+=( int n )
 		{
 			return *this = *this + n;
 		}
-		T&			operator*() 
+		T&			operator*()
 		{
 			return *element;
 		}
 
-	protected:
-		iterator( T* elem )
-			:
-			const_iterator { elem }
-		{}
+	private:
+		T* element;
 
 		friend class Vector<T>;
 	};
+
+	using	iterator = iterator_<T>;
+	using	const_iterator = iterator_<const T>;
 	/**
 	**
 	**/
-	explicit Vector( int size = 0 );
-			 Vector( const Vector& src );
-			 Vector( Vector&& src );
-			~Vector();
+	explicit		Vector( int size = 0 );
+					Vector( const Vector& src );
+					Vector( Vector&& src );
+					~Vector();
 
-	Vector<T>&  operator=( const Vector& src );
-	Vector<T>&  operator=( Vector&& src );
-	T&			operator[]( const int index );
-	const T&	operator[]( const int index ) const;
+	Vector<T>&		operator=( const Vector& src );
+	Vector<T>&		operator=( Vector&& src );
+	T&				operator[]( const int index );
+	const T&		operator[]( const int index ) const;
 
 
-	void	 resize( int n_size );
-	void	 reserve( int n_cap );
-	bool	 empty() const;
-	int		 size() const;
-	int		 capacity() const;
+	void			resize( int n_size );
+	void			reserve( int n_cap );
+	bool			empty() const;
+	int				size() const;
+	int				capacity() const;
 
-	void	 push_back( const T& obj );
-	void	 pop_back();
-	T&		 back();
-	const T& back() const;
-	iterator insert( iterator pos, const T& obj );
-	iterator erase( iterator pos );
+	void			push_back( const T& obj );
+	void			pop_back();
+	T&				back();
+	const T&		back() const;
+	iterator		insert( iterator pos, const T& obj );
+	iterator		erase( iterator pos );
 
 	iterator		begin();
 	const_iterator	cbegin();
