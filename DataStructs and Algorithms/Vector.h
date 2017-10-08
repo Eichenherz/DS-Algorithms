@@ -14,8 +14,159 @@ template<typename T>
 class Vector
 {
 public:
-	typedef		  T* iterator;
-	typedef const T* const_iterator;
+	class	const_iterator
+	{
+	public:
+		const_iterator()
+			:
+			element { nullptr }
+		{}
+
+		bool	operator==( const const_iterator& ref ) const
+		{
+			return this->element == ref.element;
+		}
+		bool	operator!=( const const_iterator& ref ) const
+		{
+			return !( *this == ref );
+		}
+		bool	operator<( const const_iterator& ref ) const
+		{
+			return  this->element < ref.element ;
+		}
+		bool	operator<=( const const_iterator& ref ) const
+		{
+			return  ( *this == ref ) || ( *this < ref );
+		}
+		bool	operator>( const const_iterator& ref ) const
+		{
+			return this->element > ref.element;
+		}
+		bool	operator>=( const const_iterator& ref ) const
+		{
+			return ( *this == ref ) || ( *this > ref );
+		}
+
+		const const_iterator&	operator++()
+		{
+			++element;
+			return *this;
+		}
+		const const_iterator&	operator++( int )
+		{
+			const const_iterator temp = *this;
+			++( *this );
+			return temp;
+		}
+		const const_iterator&	operator--()
+		{
+			--element;
+			return *this;
+		}
+		const const_iterator&	operator--( int )
+		{
+			const const_iterator temp = *this;
+			--( *this );
+			return temp;
+		}
+		const const_iterator	operator-( int n ) const
+		{
+			auto temp = *this;
+			temp.element -= n;
+			return temp;
+		}
+		const const_iterator	operator+( int n ) const
+		{
+			auto temp = *this;
+			temp.element += n;
+			return temp;
+		}
+		const const_iterator&	operator-=( int n )
+		{
+			return *this = *this - n ;
+		}
+		const const_iterator&	operator+=( int n )
+		{
+			return *this = *this + n;
+		}
+		const T&				operator*() const
+		{
+			return *element;
+		}
+
+	protected:
+		T* element;
+
+		const_iterator( T* elem )
+			:
+			element { elem }
+		{}
+
+		friend class Vector<T>;
+	};
+	class	iterator : public const_iterator
+	{
+	public:
+		iterator()
+			:
+			element { nullptr }
+		{}
+
+		iterator&	operator++()
+		{
+			++element;
+			return *this;
+		}
+		iterator&	operator++( int )
+		{
+			iterator temp = *this;
+			++( *this );
+			return temp;
+		}
+		iterator&	operator--()
+		{
+			--element;
+			return *this;
+		}
+		iterator&	operator--( int )
+		{
+			iterator temp = *this;
+			--( *this );
+			return temp;
+		}
+		iterator	operator-( int n )
+		{
+			auto temp = *this;
+			temp.element -= n;
+			return temp;
+		}
+		iterator	operator+( int n )
+		{
+			auto temp = *this;
+			temp.element += n;
+			return temp;
+		}
+		iterator&	operator-=( int n )
+		{
+			return *this = *this - n;
+		}
+		iterator&	operator+=( int n )
+		{
+			return *this = *this + n;
+		}
+		T&			operator*() 
+		{
+			return *element;
+		}
+
+	protected:
+		iterator( T* elem )
+			:
+			const_iterator { elem }
+		{}
+
+		friend class Vector<T>;
+	};
 	/**
 	**
 	**/
@@ -44,9 +195,9 @@ public:
 	iterator erase( iterator pos );
 
 	iterator		begin();
-	const_iterator	c_begin();
+	const_iterator	cbegin();
 	iterator		end();
-	const_iterator	c_end();
+	const_iterator	cend();
 
 private:
 	T*						p_objects = nullptr;
@@ -194,7 +345,7 @@ const T & Vector<T>::back() const
 template<typename T>
 typename Vector<T>::iterator Vector<T>::insert( iterator pos, const T & obj )
 {
-	assert( pos > this->begin() && pos <= this->end() );
+	assert( pos > this->begin() && pos < this->end() );
 	
 	if ( size() + 1 >= cap ) this->reserve( 2 * cap );
 
@@ -210,7 +361,7 @@ typename Vector<T>::iterator Vector<T>::insert( iterator pos, const T & obj )
 template<typename T>
 typename Vector<T>::iterator Vector<T>::erase( iterator pos )
 {
-	assert( pos > this->begin() && pos <= this->end() );
+	assert( pos > this->begin() && pos < this->end() );
 
 	if ( pos == this->end() - 1 ) this->pop_back();
 	else
@@ -244,23 +395,23 @@ int Vector<T>::capacity() const
 template<typename T>
 typename Vector<T>::iterator Vector<T>::begin()
 {
-	return &( p_objects [0] );
+	return iterator { &( p_objects [0] ) };
 }
 
 template<typename T>
-typename Vector<T>::const_iterator Vector<T>::c_begin()
+typename Vector<T>::const_iterator Vector<T>::cbegin()
 {
-	return &( p_objects [0] );
+	return const_iterator { &( p_objects [0] ) };
 }
 
 template<typename T>
 typename Vector<T>::iterator Vector<T>::end()
 {
-	return &( p_objects [lenght] );
+	return iterator { &( p_objects [lenght] ) };
 }
 
 template<typename T>
-typename Vector<T>::const_iterator Vector<T>::c_end()
+typename Vector<T>::const_iterator Vector<T>::cend()
 {
-	return &( p_objects [lenght] );
+	return const_iterator { &( p_objects [lenght] ) };
 }

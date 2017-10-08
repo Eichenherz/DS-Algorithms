@@ -29,6 +29,7 @@ public:
 		{
 			return !( *this == ref );
 		}
+
 		const const_iterator&	operator++()
 		{
 			this->p_node = p_node->next;
@@ -49,6 +50,20 @@ public:
 		{
 			const const_iterator temp = *this;
 			--( *this );
+			return temp;
+		}
+		const const_iterator	operator-( int n ) const
+		{
+			auto temp = *this;
+			for ( int i = n; i > 0; --i ) --temp;
+
+			return temp;
+		}
+		const const_iterator	operator+( int n ) const
+		{
+			auto temp = *this;
+			for ( int i = 0; i < n; ++i ) ++temp;
+
 			return temp;
 		}
 		const T&				operator*() const
@@ -90,6 +105,20 @@ public:
 		{
 			iterator temp = *this;
 			--( *this );
+			return temp;
+		}
+		iterator	operator-( int n )
+		{
+			auto temp = *this;
+			for ( int i = n; i > 0; --i ) --temp;
+
+			return temp;
+		}
+		iterator	operator+( int n )
+		{
+			auto temp = *this;
+			for ( int i = 0; i < n; ++i ) ++temp;
+
 			return temp;
 		}
 		T&			operator*()
