@@ -124,8 +124,9 @@ int josephus_M( int N, int M )
 
 }
 
-//Just for Vectors of ints
-void Generate_Rand_Uniform( Vector<int>& list, int n_obj )
+//Just for ints
+template<template<class Type >class Container>
+void Generate_Rand_Uniform( Container<int>& container, int n_obj )
 {
 	std::mt19937 rng( std::random_device {}( ) );
 	std::uniform_int_distribution<int> dist;
@@ -133,14 +134,14 @@ void Generate_Rand_Uniform( Vector<int>& list, int n_obj )
 	{
 		std::uniform_int_distribution<int> dist( -n_obj / 2, n_obj / 2 );
 		for ( ; n_obj != 0; --n_obj )
-			list.push_back( dist( rng ) );
+			container.push_back( dist( rng ) );
 	}
 
 	else
 	{
 		std::uniform_int_distribution<int> dist( -( n_obj + 1 ) / 2, n_obj / 2 );
 		for ( ; n_obj != 0; --n_obj )
-			list.push_back( dist( rng ) );
+			container.push_back( dist( rng ) );
 	}
 
 }

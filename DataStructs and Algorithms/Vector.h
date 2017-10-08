@@ -278,6 +278,7 @@ const T & Vector<T>::back() const
 template<typename T>
 typename Vector<T>::iterator Vector<T>::insert( iterator pos, const T & obj )
 {
+	assert( pos != nullptr );
 	assert( pos > this->begin() && pos < this->end() );
 	
 	if ( size() + 1 >= cap ) this->reserve( 2 * cap );
@@ -294,6 +295,7 @@ typename Vector<T>::iterator Vector<T>::insert( iterator pos, const T & obj )
 template<typename T>
 typename Vector<T>::iterator Vector<T>::erase( iterator pos )
 {
+	assert( pos != nullptr );
 	assert( pos > this->begin() && pos < this->end() );
 
 	if ( pos == this->end() - 1 ) this->pop_back();

@@ -1,15 +1,11 @@
 #pragma once
 
 #include <assert.h>
-//////////////////////////////////////
-////******************************////
-////        List CONTAINER        ////
-////******************************////
-//////////////////////////////////////
-////  TODO: add assertions & 
-////                  extra polish
-////				& testing
-//////////////////////////////////////
+////////////////////////////////////////
+////								////
+////        List CONTAINER			////
+////								////
+////////////////////////////////////////
 template<typename T>
 class List
 {
@@ -82,6 +78,11 @@ public:
 	class	reverse_iterator_ : public iterator_<T>
 	{
 	public:
+		reverse_iterator_( struct Node* p = nullptr )
+			:
+			iterator_ { p }
+		{}
+
 		reverse_iterator_&	operator--()
 		{
 			this->p_node = p_node->next;
@@ -289,6 +290,8 @@ void List<T>::pop_front()
 template<typename T>
 typename List<T>::iterator List<T>::insert( typename List<T>::iterator pos, const T & elem )
 {
+	assert( pos != nullptr );
+
 	auto temp = new Node( elem, pos.p_node->prev, pos.p_node );
 
 	pos.p_node->prev->next = temp;
@@ -301,6 +304,8 @@ typename List<T>::iterator List<T>::insert( typename List<T>::iterator pos, cons
 template<typename T>
 typename List<T>::iterator List<T>::erase( typename List<T>::iterator pos )
 {
+	assert( pos != nullptr );
+
 	auto temp = pos.p_node;
 	iterator iter { temp->next };
 
