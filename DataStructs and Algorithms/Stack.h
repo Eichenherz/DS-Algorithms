@@ -9,7 +9,7 @@ public:
 	~Stack();
 	Stack& operator=( const Stack& s ) = delete;
 
-	void	push( const T& data );
+	void	push(  T& data );
 	void	pop();
 	T		top();
 	int		size() const;
@@ -19,14 +19,14 @@ private:
 	class			Element
 	{
 	public:
-		  Element( const T& data, const Element& below = nullptr )
+		  Element(  T& data, Element* below = nullptr )
 			  :
 			  Data		{ data },
 			  p_next	{ below }
 		  {}
 		  Element( const Element& e )
 			  :
-			  Data   { e.Data }//
+			  Data   { e.Data }
 		  {
 			  if ( e.p_next != nullptr )
 				  p_next = new Element( *e.p_next );
@@ -52,6 +52,8 @@ private:
 	private:
 		Element*	p_next;
 		T			Data;
+
+		friend Stack<T>;
 	};
 	Element*		p_top;
 
@@ -84,7 +86,7 @@ inline Stack<T>::~Stack()
 }
 
 template<typename T>
-inline void Stack<T>::push( const T & data )
+inline void Stack<T>::push(  T & data )
 {
 	p_top = new Element( data, p_top );
 }
@@ -95,7 +97,11 @@ inline void Stack<T>::pop()
 	if ( !empty() )
 	{
 		auto p = p_top;
-		p_top = p_top->p_next;
+		auto p_temp = p_top->p_next;
+
+		p_top->p_next = nullptr; // VERY IMPORTANT ! Otherwise all stack gets cleared !
+		p_top = p_temp;
+
 		delete p;
 	}
 }
