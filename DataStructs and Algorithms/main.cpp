@@ -7,11 +7,12 @@
 #include <iostream>
 #include "Algorithms.h"
 #include <algorithm>
+#include "Programs.h"
 
 
 int main()
 {
-	
+	Symbol_Balancing();
 	
 	return 0;
 }

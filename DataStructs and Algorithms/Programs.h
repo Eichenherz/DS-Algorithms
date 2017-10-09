@@ -8,26 +8,24 @@ void Symbol_Balancing( void )
 {
 	Stack<char> stack;
 
-	for ( char temp = '\0'; temp != 'D'; std::cin.get( temp ) )
+	for ( char symb = '\0'; symb != 'D'; std::cin.get( symb ) )
 	{
-		switch ( temp )
+		if ( symb == '(' || symb == '[' || symb == '{' || symb == '/*' )	stack.push( symb );
+		else if ( symb == ')' || symb == ']' || symb == '}' || symb == '*/' )
 		{
-		case '(':
-			stack.push( temp );
-			break;
-		case '{':
-			stack.push( temp );
-			break;
-		case ')':
 			assert( !stack.empty() );
-			if ( stack.top() == '(' ) stack.pop();
-			else assert( 0 );
-			break;
-		case '}':
-			assert( !stack.empty() );
-			if ( stack.top() == '{' ) stack.pop();
-			else assert( 0 );
-			break;
+			switch ( symb )
+			{
+			case ')': assert( stack.top() == '(' );
+				break;
+			case ']': assert( stack.top() == '[' );
+				break;
+			case '}': assert( stack.top() == '{' );
+				break;
+			case '*/': assert( stack.top() == '/*' );
+				break;
+			}
+			stack.pop();
 		}
 	}
 
