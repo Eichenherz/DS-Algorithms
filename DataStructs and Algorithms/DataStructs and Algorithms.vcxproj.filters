@@ -42,7 +42,7 @@
     <ClInclude Include="Binary.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Programs.h">
+    <ClInclude Include="BSTree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

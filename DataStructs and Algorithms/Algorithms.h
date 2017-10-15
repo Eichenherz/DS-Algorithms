@@ -5,9 +5,10 @@
 #include <iostream>
 #include <random>
 #include <math.h>
+#include <string>
 
-//To be made template
-void Print_Lots( const List<int>& l, const List<int>& p )
+template<typename T>
+void Print_Lots( const List<T>& l, const List<T>& p )
 {
 	//lists are sorted in ascending order
 	auto	pos_itr = l.cbegin();
@@ -28,11 +29,12 @@ void Print_Lots( const List<int>& l, const List<int>& p )
 }
 
 //To support most types of containers
-template<typename Iter, typename T>
+template<class Iter, typename T>
 typename List<T>::iterator find( Iter begin, Iter end, const T& obj )
 {
-	for ( ; begin != end; ++begin )
+	for ( ; begin != end; ++begin ) {
 		if ( *begin == obj ) return begin;
+	}
 	return end;
 }
 
@@ -145,3 +147,213 @@ void Generate_Rand_Uniform( Container<int>& container, int n_obj )
 	}
 
 }
+
+void Symbol_Balancing( void )
+{
+	Stack<char> stack;
+
+	for ( char symb = '\0'; symb != '\n'; std::cin.get( symb ) )
+	{
+		if ( symb == '(' || symb == '[' || symb == '{' || symb == '/*' )	stack.push( symb );
+		else if ( symb == ')' || symb == ']' || symb == '}' || symb == '*/' )
+		{
+			assert( !stack.empty() );
+			switch ( symb )
+			{
+			case ')': assert( stack.top() == '(' );
+				break;
+			case ']': assert( stack.top() == '[' );
+				break;
+			case '}': assert( stack.top() == '{' );
+				break;
+			case '*/': assert( stack.top() == '/*' );
+				break;
+			}
+			stack.pop();
+		}
+	}
+
+	assert( stack.empty() );
+}
+
+//Pseudo Int calculator
+int Postfix_Eval( std::string buffer )
+{
+	//**********************************************//
+	// Expression format :							//
+	//  a' 'b' 'operator1 operator2' 'c' 'operator3	//
+	//  NOTE : Only ' ' counts as CMD space			//
+	//**********************************************//
+
+
+	Stack<int> stack;
+
+	int val = buffer [0] - '0';
+
+	for ( size_t i = 1; i < buffer.length(); ++i )
+	{
+		if ( buffer [i] != '+' && buffer [i] != '-' && buffer [i] != '*' &&
+			 buffer [i] != '/' && buffer [i] != '^' && buffer [i] != ' ' )
+		{
+			if ( buffer [i - 1] != ' ' ) val = val * 10 + buffer [i] - '0';
+			else val = buffer [i] - '0';
+		}
+		else if ( buffer [i] == ' ' &&  val != 0 )
+		{
+			stack.push( val );
+			val = 0;
+		}
+		else
+		{
+			if ( buffer [i] == '+' )
+			{
+				auto temp = stack.top();
+				stack.pop();
+				temp += stack.top();
+				stack.pop();
+
+				stack.push( temp );
+			}
+			else if ( buffer [i] == '-' )
+			{
+				auto temp = -stack.top();
+				stack.pop();
+				temp += stack.top();
+				stack.pop();
+
+				stack.push( temp );
+			}
+			else if ( buffer [i] == '*' )
+			{
+				auto temp = stack.top();
+				stack.pop();
+				temp *= stack.top();
+				stack.pop();
+
+				stack.push( temp );
+			}
+			else if ( buffer [i] == '/' )
+			{
+				auto temp = 1 / stack.top();
+				stack.pop();
+				temp *= stack.top();
+				stack.pop();
+
+				stack.push( temp );
+			}
+			else if ( buffer [i] == '^' )
+			{
+				auto temp = stack.top();
+				stack.pop();
+				temp *= int(log2( stack.top() ));
+				stack.pop();
+				temp = int( exp2( temp ) );
+
+				stack.push( temp );
+			}
+		}
+	}
+
+	return stack.top();
+}
+
+class Operator_Traits
+{
+public:
+	const enum class Precedence {
+		Lower,
+		Equal,
+		Higher
+	};
+
+
+	Operator_Traits( const char lhs_)
+	{
+		Init_Iter( lhs_, lhs );
+	}
+
+	Precedence precedence( const char rhs_ )
+	{
+		Init_Iter( rhs_, rhs );
+
+		if ( rhs - lhs > 0 ) return Precedence::Lower;
+		else if ( rhs - lhs == 0 ) return Precedence::Equal;
+		else if ( rhs - lhs < 0 ) return Precedence::Higher;
+	}
+
+private:
+	const std::string operators = {
+		'+', '-', '*', '/', '^' 
+	};
+	std::string::const_iterator lhs;
+	std::string::const_iterator rhs;
+
+	void Init_Iter( const char chr, std::string::const_iterator itr )
+	{
+		for ( auto iter = operators.cbegin(); iter != operators.cend(); ++iter ) {
+			if ( *iter == chr ) {
+				itr = iter;
+				break;
+			}
+		}
+	}
+};
+
+std::string To_Postfix( const std::string& infix )
+{
+	// infinx needs to have parenthesis around the subexpression w/ operatos w/ higher precedence
+	Stack<char> stack;
+	std::string postfix;
+
+	postfix.push_back( *infix.cbegin() );
+
+	for ( auto iter = infix.cbegin() + 1; iter != infix.cend(); ++iter )
+	{
+		if ( *iter != ' ' ) // Ignore infix whitespace
+		{// if ( *iter == operand )
+			if ( *iter != '+' && *iter != '-' && *iter != '*' &&
+				 *iter != '/' && *iter != '^' && *iter != '(' &&
+				 *iter != ')' ) 
+			{
+				postfix.push_back( ' ' ); // Add whitespaces before ->
+				postfix.push_back( *iter );
+				postfix.push_back( ' ' );//-> & after inserting operand, as required by the postfix precessing function
+			}
+			else { // if ( *iter == operator )
+				if ( *iter == '(' ) { stack.push( *iter ); }
+				else if ( *iter == ')' ) 
+				{
+					while ( stack.top() != '(' ) {
+						if ( stack.top() != '(' ) {
+							postfix.push_back( stack.top() ); 
+						}
+						stack.pop();
+					}
+					stack.pop();
+				}
+				else if ( stack.empty() || // Just because I was getting Exception : *nullptr from stack.top()
+						  Operator_Traits { *iter }.precedence( stack.top() ) == Operator_Traits::Precedence::Higher )
+				{ // Push to stack if *iter > stack.top()
+					stack.push( *iter ); 
+				}
+				else if ( Operator_Traits { *iter }.precedence( stack.top() ) == Operator_Traits::Precedence::Lower ||
+						  Operator_Traits { *iter }.precedence( stack.top() ) == Operator_Traits::Precedence::Equal )
+				{ //else pop operators from stack to postfix until *iter <= stack.top() is no longer true
+					if ( stack.top() != '(' ) {
+						postfix.push_back( stack.top() );
+						stack.pop();
+					}
+					stack.push( *iter );
+				}
+			}
+		}
+
+	}
+
+	for ( ; !stack.empty(); postfix.push_back( stack.top() ), stack.pop() );// Clear the stack;
+
+
+	return postfix;
+}
+
+// Postfix to infix function maybe

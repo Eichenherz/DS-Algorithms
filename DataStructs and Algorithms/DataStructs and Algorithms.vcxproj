@@ -147,9 +147,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Binary.h" />
+    <ClInclude Include="BSTree.h" />
     <ClInclude Include="List.h" />
     <ClInclude Include="Algorithms.h" />
-    <ClInclude Include="Programs.h" />
     <ClInclude Include="Queue.h" />
     <ClInclude Include="Stack.h" />
     <ClInclude Include="stdafx.h" />
