@@ -112,8 +112,8 @@ const T& BSTree<T>::min() const
 template<typename T>
 BSTree<T>::Node* BSTree<T>::Min_Node( Node * p_node ) const
 {
-	if ( p_node == nullptr ) return nullptr;
-	if ( p_node->left == nullptr ) return p_node->object;
+	assert( p_node == nullptr );
+	if ( p_node->left == nullptr ) return &(p_node->object);
 	return Min_Node( p_node->left );
 }
 
@@ -127,8 +127,8 @@ const T& BSTree<T>::max() const
 template<typename T>
 BSTree<T>::Node* BSTree<T>::Max_Node( Node * p_node ) const
 {
-	if ( p_node == nullptr ) return nullptr;
-	if ( p_node->right == nullptr ) return p_node->object;
+	assert( p_node == nullptr );
+	if ( p_node->right == nullptr ) return &(p_node->object);
 	return Max_Node( p_node->right );
 }
 
@@ -180,6 +180,7 @@ void BSTree<T>::Insert( const T & obj, Node * p_node )
 	{
 		Insert( obj, p_node->right );
 	}
+	else /* Duplicate; Do nothing */;
 }
 
 template<typename T>
