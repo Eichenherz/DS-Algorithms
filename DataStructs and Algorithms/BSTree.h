@@ -141,16 +141,19 @@ bool BSTree<T>::contains( const T & obj ) const
 template<typename T>
 bool BSTree<T>::Contains( const T& obj, Node* p_node ) const
 {
-	if ( p_node == nullptr ) return false;
-	else if ( obj < p_node->object )
+	if ( p_node->left != nullptr && obj < p_node->object )
 	{
-		Contains( obj, p_node->left );
+		return Contains( obj, p_node->left );
 	}
-	else if ( obj > p_node->object )
+	else if ( p_node->right != nullptr )
 	{
-		Contains( obj, p_node->right );
-	}
-	else return true;
+		if ( obj > p_node->object )
+		{
+			return Contains( obj, p_node->right );
+		}
+		return true; // NOTE : float
+	}	
+	return false;
 }
 
 template<typename T>
