@@ -146,6 +146,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AVLTree.h" />
     <ClInclude Include="Binary.h" />
     <ClInclude Include="BSTree.h" />
     <ClInclude Include="List.h" />
