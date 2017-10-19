@@ -1,6 +1,7 @@
 #pragma once
 
 #include <assert.h>
+#include <algorithm>
 
 /////////////////////////////////////////
 ////								 ////
@@ -26,7 +27,7 @@ public:
 
 	void		insert( const T& obj );
 	void		remove( const T& obj );
-	void		clear( struct Node* p_node = root );
+	void		clear( struct Node*& p_node = root );
 	//print tree
 private:
 	struct Node
@@ -67,8 +68,8 @@ private:
 	static constexpr int HEIGHT_IMBALANCE_THRESHOLD = 1;
 
 	/* Encapsulating recursion */
-	void	Insert( const T& obj, Node* p_node );
-	void	Remove( const T& obj, Node* p_node );
+	void	Insert( const T& obj, Node*& p_node );
+	void	Remove( const T& obj, Node*& p_node );
 	Node*	Min_Node( Node* p_node ) const;
 	Node*	Max_Node( Node* p_node ) const;
 	bool	Contains( const T& obj, Node* p_node ) const;
@@ -78,7 +79,7 @@ private:
 	void	Rotation_Right( Node*& p_node );
 	void	Double_Left( Node*& p_node );
 	void	Double_Right( Node*& p_node );
-	int		Height( Node*& p_node )
+	int		Height( Node* p_node )
 	{
 		return ( p_node == nullptr ) ? -1 : p_node->height;
 	}
@@ -104,7 +105,7 @@ AVLTree<T>::~AVLTree()
 }
 
 template<typename T>
-AVLTree<T>& AVLTree<T>::operator=( const AVLTree & tree )
+AVLTree<T>& AVLTree<T>::operator=( const AVLTree& tree )
 {
 	if ( !empty() )
 	{
@@ -127,7 +128,7 @@ const T& AVLTree<T>::min() const
 
 /* Encapsulating recursion */
 template<typename T>
-AVLTree<T>::Node* AVLTree<T>::Min_Node( Node * p_node ) const
+AVLTree<T>::Node* AVLTree<T>::Min_Node( Node* p_node ) const
 {
 	assert( p_node == nullptr );
 	if ( p_node->left == nullptr ) return &( p_node->object );
@@ -143,7 +144,7 @@ const T& AVLTree<T>::max() const
 
 /* Encapsulating recursion */
 template<typename T>
-AVLTree<T>::Node* AVLTree<T>::Max_Node( Node * p_node ) const
+AVLTree<T>::Node* AVLTree<T>::Max_Node( Node* p_node ) const
 {
 	assert( p_node == nullptr );
 	if ( p_node->right == nullptr ) return &( p_node->object );
@@ -179,6 +180,26 @@ bool AVLTree<T>::Contains( const T& obj, Node* p_node ) const
 template<typename T>
 void AVLTree<T>::Balance( Node *& p_node )
 {
+	assert( p_node != nullptr );
+
+	if ( Height( p_node->left ) - Height( p_node->right ) > HEIGHT_IMBALANCE_THRESHOLD )
+	{
+		if ( Height( p_node->left->left ) >= Height( p_node->left->right ) )
+		{
+			Rotation_Left( p_node );
+		}
+		else Double_Left( p_node );
+	}
+	else if ( Height( p_node->right ) - Height( p_node->left ) > HEIGHT_IMBALANCE_THRESHOLD )
+	{
+		if ( Height( p_node->right->right ) >= Height( p_node->right->left ) )
+		{
+			Rotation_Right( p_node );
+		}
+		else Double_Right( p_node );
+	}
+
+	p_node->height = std::max( Height( p_node->left ), Height( p_node->right ) ) + 1;
 }
 
 /* Balancing Tree */
@@ -189,7 +210,10 @@ void AVLTree<T>::Rotation_Left( Node *& p_node )
 
 	p_node->left = temp->right;
 	temp->right = p_node;
-	//adjust height
+
+	p_node->height = std::max( Height( p_node->left ), Height( p_node->right ) ) + 1;
+	temp->height = std::max( Height( temp->left ), p_node->height ) + 1;
+
 	p_node = temp;
 }
 
@@ -197,18 +221,31 @@ void AVLTree<T>::Rotation_Left( Node *& p_node )
 template<typename T>
 void AVLTree<T>::Rotation_Right( Node *& p_node )
 {
+	Node* temp = p_node->right;
+
+	p_node->right = temp->left;
+	temp->left = p_node;
+
+	p_node->height = std::max( Height( p_node->right ), Height( p_node->left ) ) + 1;
+	temp->height = std::max( Height( temp->right ), p_node->height ) + 1;
+
+	p_node = temp;
 }
 
 /* Balancing Tree */
 template<typename T>
 void AVLTree<T>::Double_Left( Node *& p_node )
 {
+	Rotation_Right( p_node->left );
+	Rotation_Left( p_node );
 }
 
 /* Balancing Tree */
 template<typename T>
 void AVLTree<T>::Double_Right( Node *& p_node )
 {
+	Rotation_Left( p_node->right );
+	Rotation_Right( p_node );
 }
 
 template<typename T>
@@ -218,14 +255,14 @@ bool AVLTree<T>::empty() const
 }
 
 template<typename T>
-void AVLTree<T>::insert( const T & obj )
+void AVLTree<T>::insert( const T& obj )
 {
 	Insert( obj, root );
 }
 
 /* Encapsulating recursion */
 template<typename T>
-void AVLTree<T>::Insert( const T & obj, Node * p_node )
+void AVLTree<T>::Insert( const T& obj, Node *& p_node )
 {
 	if ( p_node == nullptr )
 	{
@@ -240,17 +277,19 @@ void AVLTree<T>::Insert( const T & obj, Node * p_node )
 		Insert( obj, p_node->right );
 	}
 	else /* Duplicate; Do nothing */;
+
+	Balance( p_node );
 }
 
 template<typename T>
-void AVLTree<T>::remove( const T & obj )
+void AVLTree<T>::remove( const T& obj )
 {
 	Remove( obj, root );
 }
 
 /* Encapsulating recursion */
 template<typename T>
-void AVLTree<T>::Remove( const T & obj, Node * p_node )
+void AVLTree<T>::Remove( const T& obj, Node *& p_node )
 {
 	if ( p_node == nullptr ) return;
 	else if ( obj < p_node->object )
@@ -274,10 +313,12 @@ void AVLTree<T>::Remove( const T & obj, Node * p_node )
 
 		delete temp;
 	}
+
+	Balance( p_node );
 }
 
 template<typename T>
-void AVLTree<T>::clear( Node* p_node )
+void AVLTree<T>::clear( Node*& p_node )
 {
 	if ( p_node == nullptr ) return;
 	else
