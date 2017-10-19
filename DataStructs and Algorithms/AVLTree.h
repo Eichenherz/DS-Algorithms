@@ -151,7 +151,7 @@ template<typename T> typename
 AVLTree<T>::Node* AVLTree<T>::Min_Node( Node* p_node ) const
 {
 	assert( p_node == nullptr );
-	if ( p_node->left == nullptr ) return &( p_node->object );
+	if ( p_node->left == nullptr ) return reinterpret_cast<Node*>( &( p_node->object ) );
 	return Min_Node( p_node->left );
 }
 
@@ -167,7 +167,7 @@ template<typename T> typename
 AVLTree<T>::Node* AVLTree<T>::Max_Node( Node* p_node ) const
 {
 	assert( p_node == nullptr );
-	if ( p_node->right == nullptr ) return &( p_node->object );
+	if ( p_node->right == nullptr ) return reinterpret_cast<Node*>( &( p_node->object ) );
 	return Max_Node( p_node->right );
 }
 
