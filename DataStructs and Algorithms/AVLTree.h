@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <algorithm>
+#include <iostream>
 
 /////////////////////////////////////////
 ////								 ////
@@ -13,6 +14,7 @@
 template<typename T>
 class AVLTree
 {
+	struct Node;
 public:
 	AVLTree();
 	AVLTree( const AVLTree& tree );
@@ -27,8 +29,15 @@ public:
 
 	void		insert( const T& obj );
 	void		remove( const T& obj );
-	void		clear( struct Node*& p_node = root );
+	void		clear( Node*& p_node );
 	//print tree
+	void printTree() const
+	{
+		if ( empty() )
+			cout << "Empty tree" << endl;
+		else
+			printTree( root );
+	}
 private:
 	struct Node
 	{
@@ -83,6 +92,17 @@ private:
 	{
 		return ( p_node == nullptr ) ? -1 : p_node->height;
 	}
+
+	void printTree( Node *t ) const
+	{
+		if ( t != nullptr )
+		{
+			printTree( t->left );
+			std::cout << t->object << std::endl;
+			printTree( t->right );
+		}
+	}
+
 };
 
 template<typename T>
@@ -109,7 +129,7 @@ AVLTree<T>& AVLTree<T>::operator=( const AVLTree& tree )
 {
 	if ( !empty() )
 	{
-		clear();
+		clear( root );
 	}
 	if ( !tree.empty() )
 	{
@@ -123,11 +143,11 @@ template<typename T>
 const T& AVLTree<T>::min() const
 {
 	assert( !empty() );
-	return Min_Node( root )->element;
+	return Min_Node( root )->object;
 }
 
 /* Encapsulating recursion */
-template<typename T>
+template<typename T> typename
 AVLTree<T>::Node* AVLTree<T>::Min_Node( Node* p_node ) const
 {
 	assert( p_node == nullptr );
@@ -139,11 +159,11 @@ template<typename T>
 const T& AVLTree<T>::max() const
 {
 	assert( !empty() );
-	return Max_Node( root )->element;
+	return Max_Node( root )->object;
 }
 
 /* Encapsulating recursion */
-template<typename T>
+template<typename T> typename
 AVLTree<T>::Node* AVLTree<T>::Max_Node( Node* p_node ) const
 {
 	assert( p_node == nullptr );
@@ -302,8 +322,8 @@ void AVLTree<T>::Remove( const T& obj, Node *& p_node )
 	}
 	else if ( p_node->left != nullptr && p_node->right != nullptr )
 	{
-		p_node->element = Min_Node( p_node->right )->element;
-		Remove( p_node->element, p_node->right );
+		p_node->object = Min_Node( p_node->right )->object;
+		Remove( p_node->object, p_node->right );
 	}
 	else
 	{
