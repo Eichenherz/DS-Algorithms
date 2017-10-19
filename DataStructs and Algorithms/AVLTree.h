@@ -90,7 +90,8 @@ private:
 	void	Double_Right( Node*& p_node );
 	int		Height( Node* p_node )
 	{
-		return ( p_node == nullptr ) ? -1 : p_node->height;
+		if ( p_node == nullptr ) return -1;
+		else return p_node->height;
 	}
 
 	void printTree( Node *t ) const
@@ -151,7 +152,7 @@ template<typename T> typename
 AVLTree<T>::Node* AVLTree<T>::Min_Node( Node* p_node ) const
 {
 	assert( p_node == nullptr );
-	if ( p_node->left == nullptr ) return reinterpret_cast<Node*>( &( p_node->object ) );
+	if ( p_node->left == nullptr ) return p_node;
 	return Min_Node( p_node->left );
 }
 
@@ -167,7 +168,7 @@ template<typename T> typename
 AVLTree<T>::Node* AVLTree<T>::Max_Node( Node* p_node ) const
 {
 	assert( p_node == nullptr );
-	if ( p_node->right == nullptr ) return reinterpret_cast<Node*>( &( p_node->object ) );
+	if ( p_node->right == nullptr ) return p_node;
 	return Max_Node( p_node->right );
 }
 

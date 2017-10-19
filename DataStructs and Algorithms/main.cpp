@@ -23,7 +23,7 @@ int main()
 	for ( i = GAP; i != 0; i = ( i + GAP ) % NUMS )
 		t.insert( i );
 	t.remove( 0 );
-	for ( i = 1; i < NUMS; i += 2 )
+	for ( i = 1; i < NUMS; i += 2 ) // Bugged remove
 		t.remove( i );
 
 	if ( NUMS < 40 )
