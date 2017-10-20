@@ -11,6 +11,7 @@
 template<typename T>  
 class BSTree
 {
+	struct Node;
 public:
 				BSTree();
 				BSTree( const BSTree& tree );
@@ -25,8 +26,15 @@ public:
 
 	void		insert( const T& obj );
 	void		remove( const T& obj );
-	void		clear( struct Node* p_node = root );
+	void		clear( Node*& p_node );
 	//print tree
+	void printTree() const
+	{
+		if ( empty() )
+			cout << "Empty tree" << endl;
+		else
+			printTree( root );
+	}
 private:
 	struct Node
 	{
@@ -61,11 +69,21 @@ private:
 	Node* root;
 
 	/* Encapsulating recursion */
-	void	Insert( const T& obj, Node* p_node );
-	void	Remove( const T& obj, Node* p_node );
+	void	Insert( const T& obj, Node*& p_node );
+	void	Remove( const T& obj, Node*& p_node );
 	Node*	Min_Node( Node* p_node ) const;
 	Node*	Max_Node( Node* p_node ) const;
 	bool	Contains( const T& obj, Node* p_node ) const;
+
+	void printTree( Node *t ) const
+	{
+		if ( t != nullptr )
+		{
+			printTree( t->left );
+			std::cout << t->object << std::endl;
+			printTree( t->right );
+		}
+	}
 };
 
 template<typename T>
@@ -92,7 +110,7 @@ BSTree<T>& BSTree<T>::operator=( const BSTree & tree )
 {
 	if ( !empty() )
 	{
-		clear();
+		clear( root );
 	}
 	if ( !tree.empty() )
 	{
@@ -106,14 +124,14 @@ template<typename T>
 const T& BSTree<T>::min() const
 {
 	assert( !empty() );
-	return Min_Node( root )->element;
+	return Min_Node( root )->object;
 }
 
-template<typename T>
+template<typename T> typename
 BSTree<T>::Node* BSTree<T>::Min_Node( Node * p_node ) const
 {
-	assert( p_node == nullptr );
-	if ( p_node->left == nullptr ) return &(p_node->object);
+	if ( p_node == nullptr ) return nullptr;
+	if ( p_node->left == nullptr ) return p_node;
 	return Min_Node( p_node->left );
 }
 
@@ -121,14 +139,14 @@ template<typename T>
 const T& BSTree<T>::max() const
 {
 	assert( !empty() );
-	return Max_Node( root )->element;
+	return Max_Node( root )->object;
 }
 
-template<typename T>
+template<typename T> typename
 BSTree<T>::Node* BSTree<T>::Max_Node( Node * p_node ) const
 {
-	assert( p_node == nullptr );
-	if ( p_node->right == nullptr ) return &(p_node->object);
+	if ( p_node == nullptr ) return nullptr;
+	if ( p_node->right == nullptr ) return p_node;
 	return Max_Node( p_node->right );
 }
 
@@ -139,20 +157,23 @@ bool BSTree<T>::contains( const T & obj ) const
 }
 
 template<typename T>
-bool BSTree<T>::Contains( const T& obj, Node* p_node ) const
+bool BSTree<T>::Contains( const T& obj, Node* p_node ) const // bugged
 {
-	if ( p_node->left != nullptr && obj < p_node->object )
+	if ( p_node->left != nullptr )
 	{
-		return Contains( obj, p_node->left );
-	}
-	else if ( p_node->right != nullptr )
-	{
-		if ( obj > p_node->object )
+		if ( obj < p_node->object )
 		{
-			return Contains( obj, p_node->right );
+			return Contains( obj, p_node->left );
 		}
-		return true; // NOTE : float
-	}	
+		else if ( p_node->right != nullptr )
+		{
+			if ( obj > p_node->object )
+			{
+				return Contains( obj, p_node->right );
+			}
+			return true; // NOTE : float
+		}
+	}
 	return false;
 }
 
@@ -169,7 +190,7 @@ void BSTree<T>::insert( const T & obj )
 }
 
 template<typename T>
-void BSTree<T>::Insert( const T & obj, Node * p_node )
+void BSTree<T>::Insert( const T & obj, Node *& p_node )
 {
 	if ( p_node == nullptr )
 	{
@@ -193,7 +214,7 @@ void BSTree<T>::remove( const T & obj )
 }
 
 template<typename T>
-void BSTree<T>::Remove( const T & obj, Node * p_node )
+void BSTree<T>::Remove( const T & obj, Node *& p_node )
 {
 	if ( p_node == nullptr ) return;
 	else if ( obj < p_node->object ) 
@@ -206,21 +227,22 @@ void BSTree<T>::Remove( const T & obj, Node * p_node )
 	}
 	else if ( p_node->left != nullptr && p_node->right != nullptr )
 	{
-		p_node->element = Min_Node( p_node->right )->element;
-		Remove( p_node->element, p_node->right );
+		p_node->object = Min_Node( p_node->right )->object;
+		Remove( p_node->object, p_node->right );
 	}
 	else
 	{
 		Node* temp = p_node;
 
 		p_node = ( p_node->left != nullptr ) ? p_node->left : p_node->right;
-
+		temp->left = nullptr;
+		temp->right = nullptr;
 		delete temp;
 	}
 }
 
 template<typename T>
-void BSTree<T>::clear( Node* p_node )
+void BSTree<T>::clear( Node*& p_node )
 {
 	if ( p_node == nullptr ) return;
 	else

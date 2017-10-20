@@ -201,7 +201,7 @@ bool AVLTree<T>::Contains( const T& obj, Node* p_node ) const
 template<typename T>
 void AVLTree<T>::Balance( Node *& p_node )
 {
-	assert( p_node != nullptr );
+	if ( p_node == nullptr ) return;
 
 	if ( Height( p_node->left ) - Height( p_node->right ) > HEIGHT_IMBALANCE_THRESHOLD )
 	{
@@ -326,7 +326,7 @@ void AVLTree<T>::Remove( const T& obj, Node *& p_node )
 		p_node->object = Min_Node( p_node->right )->object;
 		Remove( p_node->object, p_node->right );
 	}
-	else
+	else 
 	{
 		Node* temp = p_node;
 
