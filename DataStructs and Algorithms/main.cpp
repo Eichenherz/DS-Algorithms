@@ -53,12 +53,18 @@ int main()
 
 	for ( i = 2; i < NUMS; i += 2 )
 		if ( !t2.contains( i ) )
+		{
 			cout << "Find error1!" << endl;
+			break;
+		}
 
 	for ( i = 1; i < NUMS; i += 2 )
 	{
-		if ( t2.contains( i ) )
+		if ( !t2.contains( i ) )
+		{
 			cout << "Find error2!" << endl;
+			break;
+		}
 	}
 
 	cout << "Finished testing" << endl;

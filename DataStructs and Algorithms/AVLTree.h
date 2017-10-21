@@ -39,8 +39,9 @@ public:
 			printTree( root );
 	}
 private:
-	struct Node
+	class Node
 	{
+	public:
 		T		object;
 		Node*	left;
 		Node*	right;
@@ -71,6 +72,23 @@ private:
 		}
 
 		Node& operator=( const Node& ) = delete;
+
+		bool Contains( const T& obj ) const
+		{
+			if ( obj == this->object ) return true;
+			else if ( obj < this->object )
+			{
+				if ( left == nullptr ) return false;
+				else return left->Contains( obj );
+			}
+			else if ( this->object < obj )
+			{
+				if ( right == nullptr ) return false;
+				else return right->Contains( obj );
+			}
+
+			return false;
+		}
 	};
 
 	Node* root;
@@ -81,7 +99,7 @@ private:
 	void	Remove( const T& obj, Node*& p_node );
 	Node*	Min_Node( Node* p_node ) const;
 	Node*	Max_Node( Node* p_node ) const;
-	bool	Contains( const T& obj, Node* p_node ) const;
+
 	/* Balancing Tree */
 	void	Balance( Node*& p_node );
 	void	Rotation_Left( Node*& p_node );
@@ -151,7 +169,7 @@ const T& AVLTree<T>::min() const
 template<typename T> typename
 AVLTree<T>::Node* AVLTree<T>::Min_Node( Node* p_node ) const
 {
-	assert( p_node == nullptr );
+	if ( p_node == nullptr ) return nullptr;
 	if ( p_node->left == nullptr ) return p_node;
 	return Min_Node( p_node->left );
 }
@@ -167,7 +185,7 @@ const T& AVLTree<T>::max() const
 template<typename T> typename
 AVLTree<T>::Node* AVLTree<T>::Max_Node( Node* p_node ) const
 {
-	assert( p_node == nullptr );
+	if ( p_node == nullptr ) return nullptr;
 	if ( p_node->right == nullptr ) return p_node;
 	return Max_Node( p_node->right );
 }
@@ -175,26 +193,8 @@ AVLTree<T>::Node* AVLTree<T>::Max_Node( Node* p_node ) const
 template<typename T>
 bool AVLTree<T>::contains( const T & obj ) const
 {
-	return Contains( obj, root );
-}
-
-/* Encapsulating recursion */
-template<typename T>
-bool AVLTree<T>::Contains( const T& obj, Node* p_node ) const
-{
-	if ( p_node->left != nullptr && obj < p_node->object )
-	{
-		return Contains( obj, p_node->left );
-	}
-	else if ( p_node->right != nullptr )
-	{
-		if ( obj > p_node->object )
-		{
-			return Contains( obj, p_node->right );
-		}
-		return true; // NOTE : float
-	}
-	return false;
+	if ( root == nullptr ) return false;
+	return root->Contains( obj );
 }
 
 /* Balancing Tree */
@@ -331,7 +331,8 @@ void AVLTree<T>::Remove( const T& obj, Node *& p_node )
 		Node* temp = p_node;
 
 		p_node = ( p_node->left != nullptr ) ? p_node->left : p_node->right;
-
+		temp->left = nullptr;
+		temp->right = nullptr;
 		delete temp;
 	}
 

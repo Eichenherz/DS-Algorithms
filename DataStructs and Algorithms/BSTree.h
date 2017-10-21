@@ -36,8 +36,9 @@ public:
 			printTree( root );
 	}
 private:
-	struct Node
+	class Node
 	{
+	public:
 		T		object;
 		Node*	left;
 		Node*	right;
@@ -64,6 +65,23 @@ private:
 		}
 
 		Node& operator=( const Node& ) = delete;
+
+		bool Contains( const T& obj ) const
+		{
+			if ( obj == this->object ) return true;
+			else if ( obj < this->object )
+			{
+				if ( left == nullptr ) return false;
+				else return left->Contains( obj );
+			}
+			else if ( this->object < obj )
+			{
+				if ( right == nullptr ) return false;
+				else return right->Contains( obj );
+			}
+
+			return false;
+		}
 	};
 	
 	Node* root;
@@ -73,7 +91,6 @@ private:
 	void	Remove( const T& obj, Node*& p_node );
 	Node*	Min_Node( Node* p_node ) const;
 	Node*	Max_Node( Node* p_node ) const;
-	bool	Contains( const T& obj, Node* p_node ) const;
 
 	void printTree( Node *t ) const
 	{
@@ -153,28 +170,8 @@ BSTree<T>::Node* BSTree<T>::Max_Node( Node * p_node ) const
 template<typename T>
 bool BSTree<T>::contains( const T & obj ) const
 {
-	return Contains( obj, root );
-}
-
-template<typename T>
-bool BSTree<T>::Contains( const T& obj, Node* p_node ) const // bugged
-{
-	if ( p_node->left != nullptr )
-	{
-		if ( obj < p_node->object )
-		{
-			return Contains( obj, p_node->left );
-		}
-		else if ( p_node->right != nullptr )
-		{
-			if ( obj > p_node->object )
-			{
-				return Contains( obj, p_node->right );
-			}
-			return true; // NOTE : float
-		}
-	}
-	return false;
+	if ( root == nullptr ) return false;
+	return root->Contains( obj );
 }
 
 template<typename T>
