@@ -155,6 +155,7 @@
     <ClInclude Include="Stack.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Threaded_BST.h" />
     <ClInclude Include="Vector.h" />
   </ItemGroup>
   <ItemGroup>
