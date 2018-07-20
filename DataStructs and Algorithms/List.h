@@ -14,7 +14,7 @@ public:
 	class	iterator_
 	{
 	public:
-					iterator_(struct Node* p = nullptr )
+		iterator_(struct Node* p = nullptr )
 			:
 			p_node { p }
 		{}

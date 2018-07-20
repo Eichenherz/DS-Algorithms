@@ -5,8 +5,55 @@
 template <typename T>
 class Threaded_BST
 {
-	struct Node;
+	class Node;
 public:
+	template<class T>
+	class	iterator_
+	{
+	public:
+		iterator_( Node* p = nullptr )
+			:
+			p_node { p }
+		{}
+
+		bool		operator==( const iterator_& ref ) const
+		{
+			return ( p_node == ref.p_node );
+		}
+		bool		operator!=( const iterator_& ref ) const
+		{
+			return !( *this == ref );
+		}
+
+		iterator_&	operator++()
+		{
+			this->p_node = p_node->right;
+			return *this;
+		}
+		iterator_&	operator++( int )
+		{
+			iterator_ temp = *this;
+			++( *this );
+			return temp;
+		}
+		T&			operator*()
+		{
+			return p_node->object;
+		}
+		const T&	operator*() const
+		{
+			return p_node->object;
+		}
+	private:
+		Node* p_node;
+
+		friend class Threaded_BST<T>;
+	};
+
+	using iterator			= iterator_<T>;
+	using const_iterator	= iterator_<const T>;
+
+
 					Threaded_BST();
 					Threaded_BST( const Threaded_BST& tree );
 					~Threaded_BST();
@@ -56,7 +103,6 @@ private:
 			right = nullptr;
 		}
 		Node&	operator=( const Node& ) = delete;
-
 
 		void	Add( const T& obj )
 		{

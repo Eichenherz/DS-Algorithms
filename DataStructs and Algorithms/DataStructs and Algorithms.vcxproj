@@ -149,6 +149,7 @@
     <ClInclude Include="AVLTree.h" />
     <ClInclude Include="Binary.h" />
     <ClInclude Include="BSTree.h" />
+    <ClInclude Include="Doc_Dist.h" />
     <ClInclude Include="List.h" />
     <ClInclude Include="Algorithms.h" />
     <ClInclude Include="Queue.h" />
