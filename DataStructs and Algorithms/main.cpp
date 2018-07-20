@@ -2,73 +2,20 @@
 //
 
 #include "stdafx.h"
-#include "List.h"
-#include "Stack.h"
+#include "Doc_Dist.h"
 #include <iostream>
-#include "Algorithms.h"
-#include <algorithm>
-#include "AVLTree.h"
-#include "BSTree.h"
+
 
 using namespace std;
 
 int main()
 {
-	BSTree<int> t;
-	int NUMS = 400000;
-	const int GAP = 3711;
-	int i;
+	std::ifstream file1( "f1.txt" );
+	std::ifstream file2( "f2.txt" );
 
-	cout << "Checking... (no more output means success)" << endl;
+	auto dist = Doc_Dist( file1, file2 );
 
-	for ( i = GAP; i != 0; i = ( i + GAP ) % NUMS )
-		t.insert( i );
-
-	for ( i = 1; i < NUMS; i += 2 )
-		t.remove( i );
-
-	if ( NUMS < 40 )
-		t.printTree();
-	if ( t.min() != 2 || t.max() != NUMS - 2 )
-		cout << "FindMin or FindMax error!" << endl;
-
-	for ( i = 2; i < NUMS; i += 2 )
-		if ( !t.contains( i ) )
-		{
-			cout << "Find error1!" << endl;
-			break;
-		}
-
-	for ( i = 1; i < NUMS; i += 2 )
-	{
-		if ( !t.contains( i ) )
-		{
-			cout << "Find error2!" << endl;
-			break;
-		}
-	}
-
-	BSTree<int> t2;
-	t2 = t;
-
-	for ( i = 2; i < NUMS; i += 2 )
-		if ( !t2.contains( i ) )
-		{
-			cout << "Find error1!" << endl;
-			break;
-		}
-
-	for ( i = 1; i < NUMS; i += 2 )
-	{
-		if ( !t2.contains( i ) )
-		{
-			cout << "Find error2!" << endl;
-			break;
-		}
-	}
-
-	cout << "Finished testing" << endl;
-
+	std::cout << "Doc dist is :" << dist * double( 100.0f );
 	return 0;
 }
 

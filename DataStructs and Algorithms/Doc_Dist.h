@@ -6,105 +6,75 @@
 #include <numeric>
 #include <cctype>
 #include <algorithm>
-#include <istream>
+#include <fstream>
 #include <sstream>
+#include <cassert>
 
-struct doc_vector
+using doc_vector = std::unordered_map<std::string, int>;
+
+bool Contain_Key( const doc_vector& v, const std::string& key )
 {
-	std::unordered_map<std::string, int> v;
+	return v.find( key ) != v.cend();
+}
 
-	bool	Contain_Key( const std::pair<const std::string&, int> key ) const
-	{
-		return v.find( key.first ) != v.cend();
-	}
-	double	Mag() const
-	{
-		double mag = 0.0f;
-
-		for ( const auto& word : v )
-		{
-			mag += ( word.second * word.second );
-		}
-
-		return sqrt( mag );
-	}
-};
-
-class Formatter
+double	Mag( const doc_vector& v )
 {
-public:
-	void operator()( std::string& raw_string )
+	double mag = 0.0f;
+
+	for ( const auto& word : v )
 	{
-		transform( raw_string.begin(), raw_string.end(), raw_string.begin(),
-				   [this]( unsigned char c )
-				   {
-					   return table [c];
-				   } );
+		mag += ( word.second * word.second );
 	}
 
-private:
-	class Xlat_Table
-	{
-	public:
-		Xlat_Table()
-		{
-			for ( int i = 0; i < table_size; ++i )
-			{
-				if ( std::isalpha( i ) ) table [i] = std::tolower( i );
-				else if ( std::isdigit( i ) ) table [i] = i;
-				else table [i] = ' ';
-			}
-		}
+	return sqrt( mag );
+}
 
-		unsigned char operator[]( size_t i )
-		{
-			return table [i];
-		}
+void Translate( std::string& s )
+{
+	for ( auto& c : s )
+		c = std::tolower( c );
+}
 
-	private:
-		static const int table_size = std::numeric_limits<unsigned char>::max();
-		std::array<unsigned char, table_size> table;
-	};
-
-	static Xlat_Table table;
-};
-
-doc_vector Word_Freq( std::istream& is )
+doc_vector Word_Freq( std::ifstream& is )
 {
 	doc_vector	vec;
 	std::string	input_str;
 
-	is.seekg( 0, std::ios::end );
-	size_t lenght = is.tellg();
-	is.seekg( 0, std::ios::beg );
+	is.seekg( 0, std::ios_base::end );
+	auto lenght = is.tellg();
+
+	input_str.resize( lenght );
+	is.seekg( 0, std::ios_base::beg );
 	is.read( &input_str [0], lenght );
 
-	Formatter( input_str );
-	
+	Translate( input_str );
+
 	std::istringstream	str_stream( input_str );
 	std::string			token;
 
 	while ( str_stream >> token )
 	{
-		++vec.v [token];
+		++vec [token];
 	}
 
 	return vec;
 }
 
-double Doc_Dist( std::istream& f1, std::istream& f2 )
+double Doc_Dist( std::ifstream& f1, std::ifstream& f2 )
 {
 	doc_vector v1 = Word_Freq( f1 );
 	doc_vector v2 = Word_Freq( f2 );
 
-	double mag = v1.Mag() * v2.Mag();
+	double mag = Mag(v1) * Mag(v2);
+	if ( mag == 0.0f ) return mag;
+
 	double dot_prod = 0.0f;
 
-	for ( const auto& word : v2.v )
+	for ( const auto& word : v2 )
 	{
-		if ( v1.Contain_Key( word ) )
+		if ( Contain_Key(v1,  word.first ) )
 		{
-			dot_prod += double( word.second * v1.v [word.first] );
+			dot_prod += double( word.second * v1 [word.first] );
 		}
 	}
 

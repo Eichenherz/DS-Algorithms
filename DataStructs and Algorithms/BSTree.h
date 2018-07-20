@@ -11,7 +11,7 @@
 template<typename T>  
 class BSTree
 {
-	struct Node;
+	class Node;
 public:
 				BSTree();
 				BSTree( const BSTree& tree );
@@ -248,5 +248,4 @@ void BSTree<T>::clear( Node*& p_node )
 		p_node = nullptr;
 	}
 }
-
 

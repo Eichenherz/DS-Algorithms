@@ -119,9 +119,9 @@ int josephus( int N )
 }
 
 //To be completed
-int josephus_M( int N, int M )
+void/*int*/ josephus_M( int N, int M )
 {
-	if ( M == 0 ) return N;
+	//if ( M == 0 ) return N;
 
 
 }
@@ -278,7 +278,7 @@ public:
 
 		if ( rhs - lhs > 0 ) return Precedence::Lower;
 		else if ( rhs - lhs == 0 ) return Precedence::Equal;
-		else if ( rhs - lhs < 0 ) return Precedence::Higher;
+		else return Precedence::Higher; //if ( rhs - lhs < 0 )
 	}
 
 private:
