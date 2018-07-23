@@ -2,20 +2,44 @@
 //
 
 #include "stdafx.h"
-#include "Doc_Dist.h"
+#include "Sort.h"
+#include "Algorithms.h"
 #include <iostream>
+#include <random>
 
 
 using namespace std;
 
 int main()
 {
-	std::ifstream file1( "f1.txt" );
-	std::ifstream file2( "f2.txt" );
+	std::vector<int> test;
 
-	auto dist = Doc_Dist( file1, file2 );
+	std::mt19937 rng( std::random_device {}( ) );
+	std::uniform_int_distribution<int> dist;
+	int n_obj = 10;
+	if ( n_obj % 2 == 0 )
+	{
+		std::uniform_int_distribution<int> dist( -n_obj / 2, n_obj / 2 );
+		for ( ; n_obj != 0; --n_obj )
+			test.push_back( dist( rng ) );
+	}
 
-	std::cout << "Doc dist is :" << dist * double( 100.0f );
+	else
+	{
+		std::uniform_int_distribution<int> dist( -( n_obj + 1 ) / 2, n_obj / 2 );
+		for ( ; n_obj != 0; --n_obj )
+			test.push_back( dist( rng ) );
+	}
+
+	for ( int e : test )
+		std::cout << e << ' ';
+	std::cout << std::endl;
+
+	test = Merge_Sort( test );
+
+	for ( int e : test )
+		std::cout << e << ' ';
+	std::cout << std::endl;
 	return 0;
 }
 

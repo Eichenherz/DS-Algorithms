@@ -6,6 +6,7 @@
 #include <random>
 #include <math.h>
 #include <string>
+#include "Stack.h"
 
 template<typename T>
 void Print_Lots( const List<T>& l, const List<T>& p )
