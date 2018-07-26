@@ -5,20 +5,30 @@
 #include <iterator>
 #include <iostream>
 
+
+/*
+/======================
+/		MERGE SORT
+/======================
+*/
 template<class InputIt1, class InputIt2, class OutputIt>
 OutputIt merge_routine( InputIt1 first1, InputIt1 last1,
 				InputIt2 first2, InputIt2 last2,
 				OutputIt d_first )
 {
-	for ( ; first1 != last1; ++d_first ) {
-		if ( first2 == last2 ) {
+	for ( ; first1 != last1; ++d_first ) 
+	{
+		if ( first2 == last2 )
+		{
 			return std::copy( first1, last1, d_first );
 		}
-		if ( *first2 < *first1 ) {
+		if ( *first2 < *first1 ) 
+		{
 			*d_first = *first2;
 			++first2;
 		}
-		else {
+		else 
+		{
 			*d_first = *first1;
 			++first1;
 		}
@@ -93,4 +103,62 @@ void print_test( Iter src_beg, Iter src_mid, Iter src_end,
 		std::cout << *temp << ' ';
 	}
 	std::cout << std::endl;
+}
+/*
+/======================
+/		HEAP SORT
+/======================
+*/
+template<class Iter>
+void Heapsort( Iter begin, Iter end )
+{
+	using dist_type = typename std::iterator_traits<Iter>::difference_type;
+	const dist_type size = end - begin;
+
+	//Build heap
+	for ( auto index = ( size - 1 ) >> 1; index >= 0; --index )
+	{
+		Precolate( begin, index, size );
+	}
+
+	//Sort heap
+	for ( auto index = size - 1; index > 0; --index )
+	{
+		std::swap( begin [0], begin [index] );
+		Precolate( begin, 0, index );
+	}
+	
+}
+
+template<class Iter, typename Idx, typename Dist>
+void Precolate( Iter iter, Idx idx, Dist dist )
+{
+	Idx		child = ( idx << 1 ) + 1;
+
+	if ( dist <= child )
+	{
+		return;
+	}
+	if ( ( child + 1 < dist ) && ( iter [child] < iter [child + 1] ) )
+	{
+		++child;
+	}
+	if ( !( iter [idx] < iter [child] ) )
+	{
+		return;
+	}
+	
+	std::swap( iter [idx], iter [child] );
+	Precolate( iter, child, dist );
+}
+
+template<class Iter>
+void print_heap( Iter begin, Iter end )
+{
+	std::cout << '\n';
+	for ( auto iter = begin; iter != end; ++iter )
+	{
+		std::cout << *iter << ' ';
+	}
+	std::cout << '\n';
 }
