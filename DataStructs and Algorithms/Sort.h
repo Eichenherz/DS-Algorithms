@@ -11,32 +11,6 @@
 /		MERGE SORT
 /======================
 */
-template<class InputIt1, class InputIt2, class OutputIt>
-OutputIt merge_routine( InputIt1 first1, InputIt1 last1,
-				InputIt2 first2, InputIt2 last2,
-				OutputIt d_first )
-{
-	for ( ; first1 != last1; ++d_first ) 
-	{
-		if ( first2 == last2 )
-		{
-			return std::copy( first1, last1, d_first );
-		}
-		if ( *first2 < *first1 ) 
-		{
-			*d_first = *first2;
-			++first2;
-		}
-		else 
-		{
-			*d_first = *first1;
-			++first1;
-		}
-	}
-	return std::copy( first2, last2, d_first );
-}
-
-
 template<class Iter>
 void Merge_Sort_Recursive( Iter src_beg, Iter src_end, 
 						   Iter trg_beg, Iter trg_end )
@@ -59,7 +33,7 @@ void Merge_Sort_Recursive( Iter src_beg, Iter src_end,
 	Merge_Sort_Recursive( trg_beg, trg_mid, src_beg, src_mid );
 	Merge_Sort_Recursive( trg_mid, trg_end, src_mid, src_end );
 
-	merge_routine( src_beg, src_mid, 
+	std::merge( src_beg, src_mid, 
 				src_mid, src_end,
 				trg_beg );
 
@@ -103,6 +77,23 @@ void print_test( Iter src_beg, Iter src_mid, Iter src_end,
 		std::cout << *temp << ' ';
 	}
 	std::cout << std::endl;
+}
+
+template<class Iter>
+void Mergesort( Iter beg, Iter end )
+{
+	const auto range = std::distance( beg, end );
+	if ( range < 2 )
+	{
+		return;
+	}
+	Iter mid = beg;
+	std::advance( mid, range >> 1 );
+
+	Mergesort( beg, mid );
+	Mergesort( mid, end );
+
+	std::inplace_merge( beg, mid, end );
 }
 /*
 /======================

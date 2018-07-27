@@ -128,8 +128,8 @@ void/*int*/ josephus_M( int N, int M )
 }
 
 //Just for ints
-template<template<class Type >class Container>
-void Generate_Rand_Uniform( Container<int>& container, int n_obj )
+template<class Container>
+void Generate_Rand_Uniform( Container& container, int n_obj )
 {
 	std::mt19937 rng( std::random_device {}( ) );
 	std::uniform_int_distribution<int> dist;
