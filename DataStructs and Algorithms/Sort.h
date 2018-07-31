@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <iterator>
 #include <iostream>
-
+#include <array>
 
 /*
 /======================
@@ -144,7 +144,7 @@ void Precolate( Iter iter, Idx idx, Dist dist )
 }
 
 template<class Iter>
-void print_heap( Iter begin, Iter end )
+void print_( Iter begin, Iter end )
 {
 	std::cout << '\n';
 	for ( auto iter = begin; iter != end; ++iter )
@@ -153,3 +153,123 @@ void print_heap( Iter begin, Iter end )
 	}
 	std::cout << '\n';
 }
+/*
+/======================
+/	  RADIX SORT
+/======================
+*/
+// How to sort 10^6 32-bit unsigend ints
+template<class Iter>
+void Radixsort( Iter beg, Iter end )
+{
+	using val_type	= typename std::iterator_traits<Iter>::value_type;
+	const auto lenght = std::distance( beg, end );
+
+
+	constexpr int base = 0x100;    // base 2^8 == 256
+	constexpr int bit_mask = 0xFF; // 11111111 in binary
+	std::array<size_t, base> lsb_array = {};
+
+	
+	for ( auto shift = 0, _32bits = 32; shift != _32bits; shift += 8 ) 
+	{
+		lsb_array.clear();
+		for ( auto it = beg; it != end; ++it )
+		{
+			const auto idx = ( *it >> shift ) & bit_mask;
+			++lsb_array [idx];
+		}
+	}
+
+	// To be completed....
+}
+
+/*
+/======================
+/	INSERTION SORT
+/======================
+*/
+
+/*
+/======================
+/	  QUICK SORT
+/======================
+*/
+
+template<class Iter>
+void Quicksort( Iter beg, Iter end )
+{
+
+	if ( std::distance( beg, end )  < 2 ) return;
+
+	get_pivot( beg, end ); // position( Pivot ) == beg;
+	auto pivot_pt = make_partition( beg, end );
+
+	Quicksort( beg, pivot_pt );
+	Quicksort( std::next( pivot_pt ), end );
+
+}
+
+template<class Iter>
+void get_pivot( Iter beg, Iter end )
+{
+	const auto mid_pt = std::distance( beg, end ) >> 1;
+	auto mid = std::next( beg, mid_pt );
+
+	// Compute median of 3; // Won't work for 2 elements
+	auto med3 = std::max( std::min( *beg, *mid ),
+						  std::min( std::max( *beg, *mid ), *( end - 1 ) ) ); 
+	// Move median to beg;
+	if ( med3 == *mid )
+	{
+		std::iter_swap( mid, beg );
+	}
+	else if ( med3 == *( end - 1 ) )
+	{
+		std::iter_swap( end - 1, beg );
+	}
+}
+
+template<class Iter>
+auto make_partition( Iter beg, Iter end )
+{
+	const auto pivot = *beg;
+
+	auto p_beg = std::next( beg );
+	std::advance( end, -1 );
+
+	for ( ;; )
+	{
+		while ( *p_beg < pivot && p_beg < end )
+		{
+			++p_beg;
+		}
+		while ( *end > pivot && p_beg < end )
+		{
+			--end;
+		}
+		if ( p_beg < end )
+		{
+			std::iter_swap( p_beg, end );
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	if ( *p_beg > pivot && *end < pivot )
+	{
+		std::iter_swap( p_beg, end );
+	}
+
+	while ( *beg < *p_beg )
+	{
+		std::advance( p_beg, -1 );
+	}
+
+	std::iter_swap( beg, p_beg );
+
+	return p_beg;
+}
+
